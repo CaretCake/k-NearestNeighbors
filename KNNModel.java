@@ -1,8 +1,21 @@
+import java.util.ArrayList;
+
 public class KNNModel {
+  private ArrayList<Feature> features;
+	private ArrayList<ArrayList<Double>> dataInstances;
 
   public void train(String filename) {
-    // parse data from filename
-    // store it
+      try {
+      // parse data from filename
+      ArffParser parser = new ArffParser();
+      parser.setInputFilename(filename);
+      parser.parseDataFromArffFile();
+      // store it
+      features = parser.getFeatures();
+      dataInstances = parser.getDataInstances();
+    } catch (Exception e) {
+      System.out.println(e);
+    }
   }
 
   public void test(String filename, int neighbors) {

@@ -3,7 +3,7 @@ public class KNearestNeighbors {
 
     String trainFilename = args[0];
     String testFilename = args[1];
-    int numOfNeighbors = args[2];
+    int numOfNeighbors = Integer.parseInt(args[2]);
 
     KNNModel kNNModel = new KNNModel();
 
