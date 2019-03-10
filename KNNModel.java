@@ -1,4 +1,8 @@
 import java.util.ArrayList;
+import java.util.PriorityQueue;
+import javafx.util.Pair;
+import java.util.Comparator;
+import java.util.HashMap;
 
 public class KNNModel {
   private ArrayList<Feature> features;
@@ -30,7 +34,13 @@ public class KNNModel {
       // for every instance in filename data
       for (ArrayList<Double> testInstance : testDataInstances) {
         // create a queue of some sort to store k closest neighbors
-        ArrayList<Double> distances = new ArrayList<Double>();
+        PriorityQueue<Pair<ArrayList<Double>, Double>> nearestNeighbors = new PriorityQueue<Pair<ArrayList<Double>, Double>>(neighbors, new Comparator<Pair<ArrayList<Double>, Double>>() {
+          public int compare(Pair<ArrayList<Double>, Double> lhs, Pair<ArrayList<Double>, Double> rhs) {
+              if (lhs.getValue() < rhs.getValue()) return +1;
+              if (lhs.getValue().equals(rhs.getValue())) return 0;
+              return -1;
+          }
+        });
         // for every instance in stored data
         for (ArrayList<Double> instance : dataInstances) {
           // check euclidean distance from test data instance
@@ -39,18 +49,72 @@ public class KNNModel {
             distance += Math.pow(testInstance.get(i) - instance.get(i), 2);
           }
           distance = Math.sqrt(distance);
-          distances.add(distance);
-          System.out.println(distance);
+          Pair temp = new Pair(instance, distance);
+          if (nearestNeighbors.size() < neighbors || nearestNeighbors.peek().getValue() >= distance) {
+            nearestNeighbors.add(temp);
+          }
+          if (nearestNeighbors.size() > neighbors) {
+            nearestNeighbors.poll();
+          }
+          //System.out.println(distance);
           // if distance to stored data instance < any in queue
             // add stored data instance to queue of closest neighbors
             // remove furthest distance stored data instance from queue
         }
+        /*for (int i = 0; i < neighbors; i++) {
+          System.out.print(nearestNeighbors.poll());
+        }
+        System.out.println();*/
         // predict target feature value based on closest neighbors queue
+        double predictedTargetFeatureValue  = -1;
+        if (features.get(features.size() - 1) instanceof CategoricalFeature) { // categorical, get mode
+          predictedTargetFeatureValue = getModeOfTargetFeature(nearestNeighbors);
+        } else { // numeric, get mean
+          predictedTargetFeatureValue = getMeanOfTargetFeature(nearestNeighbors);
+        }
+        System.out.println("mode: " + predictedTargetFeatureValue);
       }
       // calculate accuracy + print it (root mean squared error if target is continuous)
     } catch (Exception e) {
       System.out.println(e);
-    } 
+    }
+  }
+
+  private double getModeOfTargetFeature(PriorityQueue<Pair<ArrayList<Double>, Double>> neighbors) {
+		HashMap<Double, Integer> modeMap = new HashMap<Double, Integer>();
+		int maxOccurrences = 1;
+		double mode = -1;
+
+		while (neighbors.size() > 0) {
+      int targetFeatureIndex = neighbors.peek().getKey().size() - 1;
+			double dataValue = neighbors.poll().getKey().get(targetFeatureIndex);
+			if (modeMap.get(dataValue) != null) {
+				int total = modeMap.get(dataValue);
+				total++;
+				modeMap.put(dataValue, total);
+
+				if (total > maxOccurrences) {
+					maxOccurrences = total;
+					mode = dataValue;
+				}
+			} else {
+				modeMap.put(dataValue, 1);
+			}
+		}
+
+		return mode;
+	}
+
+  private double getMeanOfTargetFeature(PriorityQueue<Pair<ArrayList<Double>, Double>> neighbors) {
+    int numberOfInstances = neighbors.size();
+    double mean = 0;
+
+    while (neighbors.size() > 0) {
+      int targetFeatureIndex = neighbors.peek().getKey().size() - 1;
+      mean += neighbors.poll().getKey().get(targetFeatureIndex);
+    }
+
+    return mean / numberOfInstances;
   }
 
 }

@@ -77,13 +77,4 @@ public class ArffParser {
     return this.features;
   }
 
-  /*public void print() {
-    for (Feature feat : features) {
-      System.out.println(feat.toString());
-    }
-    for (ArrayList<Double> instance : dataInstances) {
-      System.out.println(instance);
-    }
-  }*/
-
 }
