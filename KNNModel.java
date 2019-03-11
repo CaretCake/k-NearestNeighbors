@@ -30,6 +30,8 @@ public class KNNModel {
       parser.parseDataFromArffFile();
       ArrayList<Feature> testFeatures = parser.getFeatures();
     	ArrayList<ArrayList<Double>> testDataInstances = parser.getDataInstances();
+      double correctPredictionCount = 0;
+      double rmse = 0;
 
       // for every instance in filename data
       for (ArrayList<Double> testInstance : testDataInstances) {
@@ -53,28 +55,31 @@ public class KNNModel {
           if (nearestNeighbors.size() < neighbors || nearestNeighbors.peek().getValue() >= distance) {
             nearestNeighbors.add(temp);
           }
-          if (nearestNeighbors.size() > neighbors) {
-            nearestNeighbors.poll();
+          if (nearestNeighbors.size() > neighbors) { // if over specified number of neighbors to check
+            nearestNeighbors.poll(); // remove furthest neighbor
           }
-          //System.out.println(distance);
-          // if distance to stored data instance < any in queue
-            // add stored data instance to queue of closest neighbors
-            // remove furthest distance stored data instance from queue
         }
-        /*for (int i = 0; i < neighbors; i++) {
-          System.out.print(nearestNeighbors.poll());
-        }
-        System.out.println();*/
+        
         // predict target feature value based on closest neighbors queue
         double predictedTargetFeatureValue  = -1;
         if (features.get(features.size() - 1) instanceof CategoricalFeature) { // categorical, get mode
           predictedTargetFeatureValue = getModeOfTargetFeature(nearestNeighbors);
+          if (predictedTargetFeatureValue == testInstance.get(testInstance.size() - 1)) {
+            correctPredictionCount++;
+          }
         } else { // numeric, get mean
           predictedTargetFeatureValue = getMeanOfTargetFeature(nearestNeighbors);
+          rmse += Math.pow((predictedTargetFeatureValue - testInstance.get(testInstance.size() - 1)), 2);
         }
-        System.out.println("mode: " + predictedTargetFeatureValue);
       }
-      // calculate accuracy + print it (root mean squared error if target is continuous)
+
+      if (features.get(features.size() - 1) instanceof CategoricalFeature) { // categorical, calc accuracy
+        double accuracy = correctPredictionCount / testDataInstances.size();
+        System.out.println("accuracy: " + (accuracy * 100) + "%");
+      } else { // numeric, calc root mean squared error
+        rmse = Math.pow(rmse / testDataInstances.size(), 0.5);
+        System.out.println("rmse: " + rmse);
+      }
     } catch (Exception e) {
       System.out.println(e);
     }
@@ -82,24 +87,25 @@ public class KNNModel {
 
   private double getModeOfTargetFeature(PriorityQueue<Pair<ArrayList<Double>, Double>> neighbors) {
 		HashMap<Double, Integer> modeMap = new HashMap<Double, Integer>();
-		int maxOccurrences = 1;
+		int maxOccurrences = 0;
 		double mode = -1;
 
 		while (neighbors.size() > 0) {
       int targetFeatureIndex = neighbors.peek().getKey().size() - 1;
 			double dataValue = neighbors.poll().getKey().get(targetFeatureIndex);
+      int total = 0;
 			if (modeMap.get(dataValue) != null) {
-				int total = modeMap.get(dataValue);
+				total = modeMap.get(dataValue);
 				total++;
 				modeMap.put(dataValue, total);
-
-				if (total > maxOccurrences) {
-					maxOccurrences = total;
-					mode = dataValue;
-				}
 			} else {
 				modeMap.put(dataValue, 1);
+        total = 1;
 			}
+      if (total > maxOccurrences) {
+        maxOccurrences = total;
+        mode = dataValue;
+      }
 		}
 
 		return mode;
