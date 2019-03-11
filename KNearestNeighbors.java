@@ -4,6 +4,10 @@ public class KNearestNeighbors {
     String trainFilename = args[0];
     String testFilename = args[1];
     int numOfNeighbors = Integer.parseInt(args[2]);
+    int distanceType = 0;
+    if (args.length > 3) {
+      distanceType = getDistanceTypeInteger(args[3].trim());
+    }
 
     if (numOfNeighbors < 1) {
       System.out.println("Cannot use less than 1 neighbor.");
@@ -13,7 +17,19 @@ public class KNearestNeighbors {
     KNNModel kNNModel = new KNNModel();
 
     kNNModel.train(trainFilename);
-    kNNModel.test(testFilename, numOfNeighbors);
+    kNNModel.test(testFilename, numOfNeighbors, distanceType);
 
+  }
+
+  public static int getDistanceTypeInteger (String input) {
+    if (input.equals("Euc")) {
+      return 0;
+    } else if (input.equals("Man")) {
+      return 1;
+    } else {
+      System.out.println("Distance type must be entered as 'Euc' (Euclidean) or 'Man' (Manhattan)");
+      System.exit(0);
+      return 0;
+    }
   }
 }

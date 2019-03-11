@@ -22,7 +22,7 @@ public class KNNModel {
     }
   }
 
-  public void test(String filename, int neighbors) {
+  public void test(String filename, int neighbors, int distanceType) {
     // parse data from filename
     try {
       ArffParser parser = new ArffParser();
@@ -47,10 +47,16 @@ public class KNNModel {
         for (ArrayList<Double> instance : dataInstances) {
           // check euclidean distance from test data instance
           double distance = 0;
-          for (int i = 0; i < instance.size(); i++) {
-            distance += Math.pow(testInstance.get(i) - instance.get(i), 2);
+          if (distanceType == 0) { // Euclidean
+            for (int i = 0; i < instance.size(); i++) {
+              distance += Math.pow(testInstance.get(i) - instance.get(i), 2);
+            }
+            distance = Math.sqrt(distance);
+          } else if (distanceType == 1)  { // Manhattan
+            for (int i = 0; i < instance.size(); i++) {
+              distance += Math.abs(testInstance.get(i) - instance.get(i));
+            }
           }
-          distance = Math.sqrt(distance);
           Pair temp = new Pair(instance, distance);
           if (nearestNeighbors.size() < neighbors || nearestNeighbors.peek().getValue() >= distance) {
             nearestNeighbors.add(temp);
