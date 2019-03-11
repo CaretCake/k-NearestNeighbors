@@ -59,7 +59,7 @@ public class KNNModel {
             nearestNeighbors.poll(); // remove furthest neighbor
           }
         }
-        
+
         // predict target feature value based on closest neighbors queue
         double predictedTargetFeatureValue  = -1;
         if (features.get(features.size() - 1) instanceof CategoricalFeature) { // categorical, get mode
@@ -75,10 +75,10 @@ public class KNNModel {
 
       if (features.get(features.size() - 1) instanceof CategoricalFeature) { // categorical, calc accuracy
         double accuracy = correctPredictionCount / testDataInstances.size();
-        System.out.println("accuracy: " + (accuracy * 100) + "%");
+        System.out.println("Accuracy when considering " + neighbors + " neighbors: " + (accuracy * 100) + "%");
       } else { // numeric, calc root mean squared error
         rmse = Math.pow(rmse / testDataInstances.size(), 0.5);
-        System.out.println("rmse: " + rmse);
+        System.out.println("RMSE when considering " + neighbors + " neighbors: " + rmse);
       }
     } catch (Exception e) {
       System.out.println(e);
