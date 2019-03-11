@@ -3,7 +3,7 @@ Java implementation of k-Nearest Neighbors algorithm with options to choose Eucl
 
 ## Description
 
-A Java program which reads in data from a .arff file containing a training dataset and then creates a k-nearest neighbors model based on said data. It will then test the model given a specified number of neighbors to check against on another .arff file containing a test dataset. Finally, it will print out the root mean squared deviation or accuracy, depending on if the target feature is categorical or numeric. Currently, it will only work with categorical and numeric features.
+A Java program which reads in data from a .arff file containing a training dataset and then creates a k-nearest neighbors model based on said data. It will then test the model given a specified number of neighbors to check against on another .arff file containing a test dataset. Distance to neighbors is default calculated using the Euclidean distance formula, or can be specified when run on the command line to use either the Euclidean or Manhattan distance formula. Finally, it will print out the root mean squared deviation or accuracy, depending on if the target feature is categorical or numeric. Currently, it will only work with categorical and numeric features.
 
 ## Getting Started
 
