@@ -8,6 +8,10 @@ public class KNNModel {
   private ArrayList<Feature> features;
 	private ArrayList<ArrayList<Double>> dataInstances;
 
+  /* Parses and stores feature names and data instances from training dataset .arff file for model
+   *
+   * @param filename string containing name of the .arff file containing the training dataset
+   */
   public void train(String filename) {
       try {
       // parse data from filename
@@ -22,6 +26,15 @@ public class KNNModel {
     }
   }
 
+  /* Parses and stores feature names and data instances from test dataset .arff file, then iterates
+   * through each test data instance finds specified number of closest neighbors that instance using
+   * specified distance formula, and finally makes prediction based on the k closest neighbors. Prints
+   * final accuracy or root mean squared deviation.
+   *
+   * @param filename string containing name of the .arff file containing the training dataset
+   * @param neighbors the number of neighbors to be considered for each test data instance
+   * @param distanceType integer indicating which distance formula to use [0 - Euclidean, 1 - Manhattan]
+   */
   public void test(String filename, int neighbors, int distanceType) {
     // parse data from filename
     try {
@@ -91,32 +104,44 @@ public class KNNModel {
     }
   }
 
+  /* Returns the mode of the nearest neighbors' categorical target feature values.
+   *
+   * @param neighbors a priority queue containing pairs of the k nearest neighbor data instances
+   *    and their distance from particular test data instance
+   * @return a double containing the mode of the nearest neighbors' target feature values
+   */
   private double getModeOfTargetFeature(PriorityQueue<Pair<ArrayList<Double>, Double>> neighbors) {
-		HashMap<Double, Integer> modeMap = new HashMap<Double, Integer>();
-		int maxOccurrences = 0;
-		double mode = -1;
+    HashMap<Double, Integer> modeMap = new HashMap<Double, Integer>();
+    int maxOccurrences = 0;
+    double mode = -1;
 
-		while (neighbors.size() > 0) {
+    while (neighbors.size() > 0) {
       int targetFeatureIndex = neighbors.peek().getKey().size() - 1;
-			double dataValue = neighbors.poll().getKey().get(targetFeatureIndex);
+      double dataValue = neighbors.poll().getKey().get(targetFeatureIndex);
       int total = 0;
-			if (modeMap.get(dataValue) != null) {
-				total = modeMap.get(dataValue);
-				total++;
-				modeMap.put(dataValue, total);
-			} else {
-				modeMap.put(dataValue, 1);
+      if (modeMap.get(dataValue) != null) {
+        total = modeMap.get(dataValue);
+        total++;
+        modeMap.put(dataValue, total);
+      } else {
+        modeMap.put(dataValue, 1);
         total = 1;
-			}
+      }
       if (total > maxOccurrences) {
         maxOccurrences = total;
         mode = dataValue;
       }
-		}
+    }
 
-		return mode;
-	}
+    return mode;
+  }
 
+  /* Returns the mean of the nearest neighbors' numeric target feature values.
+   *
+   * @param neighbors a priority queue containing pairs of the k nearest neighbor data instances
+   *    and their distance from particular test data instance
+   * @return a double containing the mean of the nearest neighbors' target feature values
+   */
   private double getMeanOfTargetFeature(PriorityQueue<Pair<ArrayList<Double>, Double>> neighbors) {
     int numberOfInstances = neighbors.size();
     double mean = 0;

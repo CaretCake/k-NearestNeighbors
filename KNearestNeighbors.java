@@ -21,6 +21,11 @@ public class KNearestNeighbors {
 
   }
 
+  /* Converts user's string input to correct integer value for chosen distance type.
+	 *
+ 	 * @param input a string containing the user's specified distance type
+ 	 * @return an int representing chosen distance type
+   */
   public static int getDistanceTypeInteger (String input) {
     if (input.equals("Euc")) {
       return 0;
