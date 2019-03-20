@@ -19,9 +19,9 @@ public class ArffParser {
 		ArrayList<Double> processedDataInstance = new ArrayList<Double>();
 		double processedValue = 0;
 		for (int i = 0; i < data.length; i++) {
-      Feature feat = features.get(i);
+      		Feature feat = features.get(i);
 			if (feat instanceof CategoricalFeature) {
-        CategoricalFeature fe = (CategoricalFeature)features.get(i);
+        			CategoricalFeature fe = (CategoricalFeature)features.get(i);
 				processedValue = fe.getIndexOfCategoricalFeatureValue(data[i]);
 				processedDataInstance.add(processedValue);
 			} else {
@@ -46,12 +46,12 @@ public class ArffParser {
 						String[] lineSplitOnSpace = line.split(" ");
 						switch (lineSplitOnSpace[2].trim()) {
 							case "numeric":
-                Feature numFeature = new NumericFeature(lineSplitOnSpace[1].trim());
+                						Feature numFeature = new NumericFeature(lineSplitOnSpace[1].trim());
 								this.features.add(numFeature);
 								break;
 							default:
-                Feature catFeature = new CategoricalFeature(lineSplitOnSpace[1].trim(), lineSplitOnSpace[2].trim());
-                this.features.add(catFeature);
+                						Feature catFeature = new CategoricalFeature(lineSplitOnSpace[1].trim(), lineSplitOnSpace[2].trim());
+               							this.features.add(catFeature);
 								break;
 						}
 					} else {
